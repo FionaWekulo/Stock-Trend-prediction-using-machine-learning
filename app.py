@@ -7,9 +7,9 @@ import streamlit as st
 import yfinance as yf
 
 start = '2010-01-01'
-end = '2022-12-2'
+end = '2022-12-12'
 
-st.title('Stock Trend Prediction System')
+st.title('Stock Market Prediction System')
 
 user_input=st.text_input("Enter the Stock Ticker:", 'AMZN')
 df=data.DataReader(user_input,'yahoo',start,end)
@@ -22,23 +22,32 @@ st.write(df.describe())
 #VISUALISATIONS
 st.subheader('Closing Price VS Time Chart')
 fig=plt.figure(figsize=(12,6))
-plt.plot(df.Close)
+plt.plot(df.Close,'b',label='Closing price')
+plt.legend()
+plt.show()
 st.pyplot(fig)
 
 st.subheader('Closing Price VS Time with 100 moving average')
 ma100=df.Close.rolling(100).mean()
 fig = plt.figure(figsize=(12,6))
-plt.plot(ma100)
 plt.plot(df.Close)
+plt.plot(df.Close,'b',label='Closing price')
+plt.plot(ma100,'r', label='ma100')
+plt.ylabel('Closing price')
+plt.xlabel('Moving average of 100')
+plt.legend()
+plt.show()
 st.pyplot(fig)
 
 st.subheader('Closing Price VS Time with 100 & 200 moving average')
 ma100=df.Close.rolling(100).mean()
 ma200=df.Close.rolling(200).mean()
 fig = plt.figure(figsize=(12,6))
-plt.plot(ma100, 'r')
-plt.plot(ma200, 'g')
-plt.plot(df.Close,'b')
+plt.plot(df.Close,'b',label='Closing price')
+plt.plot(ma100,'r', label='ma100')
+plt.plot(ma200,'g', label='ma200')
+plt.legend()
+plt.show()
 st.pyplot(fig)
 
 #splitting data into training and testing set
