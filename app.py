@@ -1,37 +1,39 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import pandas_datareader as data
 from keras.models import load_model
 import streamlit as st
 import yfinance as yf
+from pandas_datareader import data as pdr
 
-start = '2010-01-01'
-end = '2022-12-12'
+yf.pdr_override()
+y_symbol = ['AAPL']
+startdate = '2010-01-01'
+enddate = '2023-1-10'
 
 st.title('Stock Market Prediction System')
 
-user_input=st.text_input("Enter the Stock Ticker:", 'AMZN')
-df=data.DataReader(user_input,'yahoo',start,end)
+y_symbol=st.text_input("Enter the Stock Ticker:", 'AMZN')
+data=pdr.get_data_yahoo(y_symbol,startdate,enddate)
 
 #Describing the data
-st.subheader('Data from 2010-2022')
-st.write(df.describe())
+st.subheader('Data from 2010-2023')
+st.write(data.describe())
 #SBIN.NS
 
 #VISUALISATIONS
 st.subheader('Closing Price VS Time Chart')
 fig=plt.figure(figsize=(12,6))
-plt.plot(df.Close,'b',label='Closing price')
+plt.plot(data.Close,'b',label='Closing price')
 plt.legend()
 plt.show()
 st.pyplot(fig)
 
 st.subheader('Closing Price VS Time with 100 moving average')
-ma100=df.Close.rolling(100).mean()
+ma100=data.Close.rolling(100).mean()
 fig = plt.figure(figsize=(12,6))
-plt.plot(df.Close)
-plt.plot(df.Close,'b',label='Closing price')
+plt.plot(data.Close)
+plt.plot(data.Close,'b',label='Closing price')
 plt.plot(ma100,'r', label='ma100')
 plt.ylabel('Closing price')
 plt.xlabel('Moving average of 100')
@@ -40,10 +42,10 @@ plt.show()
 st.pyplot(fig)
 
 st.subheader('Closing Price VS Time with 100 & 200 moving average')
-ma100=df.Close.rolling(100).mean()
-ma200=df.Close.rolling(200).mean()
+ma100=data.Close.rolling(100).mean()
+ma200=data.Close.rolling(200).mean()
 fig = plt.figure(figsize=(12,6))
-plt.plot(df.Close,'b',label='Closing price')
+plt.plot(data.Close,'b',label='Closing price')
 plt.plot(ma100,'r', label='ma100')
 plt.plot(ma200,'g', label='ma200')
 plt.legend()
@@ -51,8 +53,8 @@ plt.show()
 st.pyplot(fig)
 
 #splitting data into training and testing set
-data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
-data_testing=pd.DataFrame(df['Close'][int(len(df)*0.70):int(len(df))])
+data_training = pd.DataFrame(data['Close'][0:int(len(data)*0.70)])
+data_testing=pd.DataFrame(data['Close'][int(len(data)*0.70):int(len(data))])
 print(data_training.shape)
 print(data_testing.shape)
 
@@ -76,8 +78,8 @@ model=load_model('keras_model.h5')
 
 #TESTING PART
 past_100_days = data_training.tail(100)
-final_df=past_100_days.append(data_testing, ignore_index=True)
-input_data=scaler.fit_transform(final_df)
+final_data=past_100_days.append(data_testing, ignore_index=True)
+input_data=scaler.fit_transform(final_data)
 
 x_test=[]
 y_test=[]
